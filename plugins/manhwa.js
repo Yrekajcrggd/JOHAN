@@ -42,6 +42,6 @@ let handler = async (m, { conn, text }) => {
 
 handler.help = ['manhwa'];
 handler.tags = ['anime'];
-handler.command = /^مانهوا/i;
+handler.command = /^مانها/i;
 
 export default handler;
