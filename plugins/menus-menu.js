@@ -184,12 +184,12 @@ function clockString(ms) {
 
     function ucapan() {
       const time = moment.tz('Egypt').format('HH')
-      let res = "بداية يوم سعيده ☀️"
+      let res = "❤️منورين❤️☀️"
       if (time >= 4) {
         res = "صباح الخير 🌄"
       }
       if (time >= 10) {
-        res = "مساء الخير ☀️"
+        res = "سلام عليكم ☀️"
       }
       if (time >= 15) {
         res = "مساء الخير 🌇"
