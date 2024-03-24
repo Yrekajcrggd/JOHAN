@@ -1,31 +1,31 @@
-let timeout = 60000
-let poin = 500
-let handler = async (m, { conn, command, usedPrefix }) => {
-    conn.tebakbendera = conn.tebakbendera ? conn.tebakbendera : {}
+import similarity from 'similarity'
+const threshold = 0.72
+export async function before(m) {
     let id = m.chat
-    if (id in conn.tebakbendera) {
-        conn.reply(m.chat, '❐┃لم يتم الاجابة علي السؤال بعد┃❌ ❯', conn.tebakbendera[id][0])
-        throw false
-    }
-    let src = await (await fetch('https://gist.githubusercontent.com/marwangt/e884854ca3a54690419c4a2a389de55f/raw/85fbc98f871e64928411ab82df140c2c8659db85/%25D8%25A7%25D8%25AD%25D8%25B2%25D8%25B1.js')).json()
-  let json = src[Math.floor(Math.random() * src.length)]
-    let caption = `*${command.toUpperCase()}*
-  ❐↞┇الـوقـت⏳↞ *${(timeout / 1000).toFixed(2)} ┇
-  *استخدم .انسحب للأنسحاب*
-  ❐↞┇الـجـائـزة💰↞ ${poin} نقاط┇
-『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』
-     `.trim()
-    conn.tebakbendera[id] = [
-        await conn.sendFile(m.chat, json.img, '', caption, m),
-        json, poin,
-        setTimeout(() => {
-            if (conn.tebakbendera[id]) conn.reply(m.chat, `❮ ⌛┇انتهي الوقت┇⌛❯\n❐↞┇الاجـابـة✅↞ ${json.name}*┇`, conn.tebakbendera[id][0])
-            delete conn.tebakbendera[id]
-        }, timeout)
-    ]
-}
-handler.help = ['guessflag']
-handler.tags = ['game']
-handler.command = /^احزر/i
+    if (!m.quoted || !m.quoted.fromMe || !m.quoted.isBaileys || !m.text || !/استخدم.*انسحب/i.test(m.quoted.text) || /.*hhint/i.test(m.text))
+        return !0
+    this.tebakbendera = this.tebakbendera ? this.tebakbendera : {}
+    if (!(id in this.tebakbendera))
+        return this.reply(m.chat, '*❐┃لقد انتها هذا الامر اكتبه مجددا لي العب من جديد┃🌸 ❯*\n*『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』*', m)
+    if (m.quoted.id == this.tebakbendera[id][0].id) {
+        let isSurrender = /^(انسحب|surr?ender)$/i.test(m.text)
+        if (isSurrender) {
+            clearTimeout(this.tebakbendera[id][3])
+            delete this.tebakbendera[id]
+            return this.reply(m.chat, '*❐┃لم تكن كما ضننت┃🌸 ❯*\n*『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』*', m)
+        }
+        let json = JSON.parse(JSON.stringify(this.tebakbendera[id][1]))
 
-export default handler
+        if (m.text.toLowerCase() == json.name.toLowerCase().trim()) {
+            global.db.data.users[m.sender].exp += this.tebakbendera[id][2]
+            this.reply(m.chat, `*❐┃اجـابـة صـحـيـحـة┃✅❯*\n\n*❐↞┇الـجـائـزة💰↞${this.tebakbendera[id][2]} نقطه*\n*『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』*`, m)
+            clearTimeout(this.tebakbendera[id][3])
+            delete this.tebakbendera[id]
+        } else if (similarity(m.text.toLowerCase(), json.name.toLowerCase().trim()) >= threshold)
+            m.reply(`*❐┃لقد كنت على وشك النجاح┃❌ ❯*\n*『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』*`)
+        else
+            this.reply(m.chat, `*❐┃اجـابـة خـاطـئـة┃❌ ❯*\n*『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』*`, m)
+    }
+    return !0
+}
+export const exp = 0
