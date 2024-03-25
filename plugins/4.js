@@ -1,18 +1,37 @@
-import {wallpaper} from '@bochilteam/scraper';
-import _translate from "./_translate.js"
-const tradutor = _translate.plugins.downloader_wallpaper
-// Para configurar o idioma, na raiz do projeto altere o arquivo config.json
-// Para configurar el idioma, en la raíz del proyecto, modifique el archivo config.json.
-// To set the language, in the root of the project, modify the config.json file.
+import fetch from 'node-fetch'
+import { pinterest } from '../lib/scrape.js'
 
+let handler = async (m, { conn, command, text, usedPrefix }) => {
 
-const handler = async (m, {conn, text, usedPrefix, command}) => {
-  if (!text) throw `${tradutor.texto1} ${usedPrefix + command} Minecraft*`;
-  const res = await wallpaper(text);
-  const img = res[Math.floor(Math.random() * res.length)];
-  conn.sendFile(m.chat, img, 'error.jpg', `${tradutor.texto2} ${text}*`, m);
-};
-handler.help = ['', '2'].map((v) => 'wallpaper' + v + ' <query>');
-handler.tags = ['downloader'];
-handler.command = /^(خلفية?)$/i;
-export default handler;
+  try {
+    const hasil = await pinterest('Hunter × Hunter 4K');
+    let gambarUrls = hasil.slice(0, 20); // Ambil 20 gambar pertama
+
+    // Mengacak array gambarUrls
+    for (let i = gambarUrls.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [gambarUrls[i], gambarUrls[j]] = [gambarUrls[j], gambarUrls[i]];
+    }
+
+    // Mengirim 10 gambar secara acak
+    for (let i = 0; i < 5; i++) {
+      let imageUrl = gambarUrls[i];
+      let imageRes = await fetch(imageUrl);
+      let imageBuffer = await imageRes.buffer();
+
+      // Menggunakan fungsi sendImage untuk mengirim gambar ke WhatsApp
+      await conn.sendFile(m.chat, imageBuffer, 'Dragon-ball-z.jpg', '');
+
+      // Tambahkan jeda agar tidak mengirim gambar terlalu cepat
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  } catch (e) {
+    console.log(e)
+    conn.reply(m.chat, 'Error', m)
+  }
+}
+
+handler.help = ['هانتر']
+handler.tags = ['anime']
+handler.command = /^هانتر$/i
+export default handler
