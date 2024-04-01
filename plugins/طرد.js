@@ -13,7 +13,7 @@ m.reply(`*طردك فحلك روح ابكي عند امك ترجعك 😲!*`)
 
 handler.help = ['kick @user']
 handler.tags = ['group']
-handler.command = ['kick', 'شوت'] 
+handler.command = ['kick', 'طرد'] 
 handler.admin = true
 handler.group = true
 handler.botAdmin = true
